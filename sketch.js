@@ -13,28 +13,14 @@ let showFlashing = true
 let regular = []
 let flashing = []
 
+let button
+
 
 function setup() {
 	createCanvas(600,500);
-	//construct the stairs for both ratchets
-	//each ratchet is made of 12 steps that begin of screen (negative x value)
-	if (showReg) {
-		for (let i = -2; i < 10; i++) {
-			let x = 60 * i
-			let r = new Stairs(x,40,regWidth,120,regSpeed)
-			regular.push(r)
-		}
-	} else {
-		ballOnReg = false //if the regular stair is off, the ball has to start on flashing
-	}
-	if (showFlashing){
-		for (let i = -2; i < 10; i++) {
-			let x = 60 * i
-			let r = new Stairs(x,40,flashWidth,0,flSpeed1)
-			flashing.push(r)
-		}
-	}
-	
+	resetSketch()
+	button = createButton('Reset');
+	button.mousePressed(resetSketch);
 }
 
 function draw() {
@@ -124,6 +110,29 @@ class Stairs {
 		if (hasBall){
 			fill(250)
 			ellipse(newy + 50, newx - 15, 30);
+		}
+	}
+}
+
+function resetSketch() {
+	regular = []
+	flashing = []
+	//construct the stairs for both ratchets
+	//each ratchet is made of 12 steps that begin of screen (negative x value)
+	if (showReg) {
+		for (let i = -2; i < 10; i++) {
+			let x = 60 * i
+			let r = new Stairs(x,40,regWidth,120,regSpeed)
+			regular.push(r)
+		}
+	} else {
+		ballOnReg = false //if the regular stair is off, the ball has to start on flashing
+	}
+	if (showFlashing){
+		for (let i = -2; i < 10; i++) {
+			let x = 60 * i
+			let r = new Stairs(x,40,flashWidth,0,flSpeed1)
+			flashing.push(r)
 		}
 	}
 }
