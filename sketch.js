@@ -4,8 +4,8 @@ let regWidth = 60 //control the width of the regular step in pixels
 let flashWidth = 80 //control the width of the flash step in pixels
 
 let regSpeed = 2 //one speed for regular and 2 for the flashing
-let flSpeed1 = 4 //the fast flashing DOWN speed
-let flSpeed2 = -2 //slow flashing UP speed
+let flSpeed1 = 7 //the fast flashing DOWN speed
+let flSpeed2 = -1 //slow flashing UP speed
 
 let showReg = true
 let showFlashing = true
@@ -13,7 +13,7 @@ let showFlashing = true
 let regular = []
 let flashing = []
 
-let button
+let button, regButton, flButton, bothButton
 
 
 function setup() {
@@ -21,6 +21,25 @@ function setup() {
 	resetSketch()
 	button = createButton('Reset');
 	button.mousePressed(resetSketch);
+	regButton = createButton('Regular');
+	flButton = createButton('Flashing');
+	bothButton = createButton('Both');
+	regButton.mousePressed( () => {
+		showReg = true;
+		showFlashing = false
+		resetSketch()
+	}
+	);
+	flButton.mousePressed(() => {
+		showReg = false;
+		showFlashing = true
+		resetSketch()
+	});
+	bothButton.mousePressed(() => {
+		showReg = true;
+		showFlashing = true
+		resetSketch()
+	});
 }
 
 function draw() {
@@ -85,7 +104,7 @@ class Stairs {
 				this.x = this.x + speedOne
 			} else {
 				//cycle every 50 between fast down and slow up speed
-				if (Math.ceil(this.counter / 50) % 2 === 1 ) {
+				if (Math.ceil(this.counter / 50) % 3 === 1 ) {
 					this.x = this.x + speedOne
 					this.currentSpeed = speedOne
 				} else {
@@ -117,9 +136,11 @@ class Stairs {
 function resetSketch() {
 	regular = []
 	flashing = []
+	ballLoc = 0
 	//construct the stairs for both ratchets
 	//each ratchet is made of 12 steps that begin of screen (negative x value)
 	if (showReg) {
+		ballOnReg = true
 		for (let i = -2; i < 10; i++) {
 			let x = 60 * i
 			let r = new Stairs(x,40,regWidth,120,regSpeed)
