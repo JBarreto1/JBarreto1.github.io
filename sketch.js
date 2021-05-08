@@ -3,8 +3,8 @@ let ballOnReg = true //which stair set is the ball on? true=reg false=flashing
 let regWidth = 60 //control the width of the regular step in pixels
 let flashWidth = 80 //control the width of the flash step in pixels
 
-let regSpeed = 2 //one speed for regular and 2 for the flashing
-let flSpeed1 = 7 //the fast flashing DOWN speed
+let regSpeed = 1 //one speed for regular and 2 for the flashing
+let flSpeed1 = 3 //the fast flashing DOWN speed
 let flSpeed2 = -1 //slow flashing UP speed
 
 let showReg = true
@@ -18,12 +18,12 @@ let button, regButton, flButton, bothButton
 
 function setup() {
 	createCanvas(600,500);
-	resetSketch()
 	button = createButton('Reset');
-	button.mousePressed(resetSketch);
 	regButton = createButton('Regular');
 	flButton = createButton('Flashing');
 	bothButton = createButton('Both');
+	resetSketch()
+	button.mousePressed(resetSketch);
 	regButton.mousePressed( () => {
 		showReg = true;
 		showFlashing = false
@@ -35,6 +35,7 @@ function setup() {
 		showFlashing = true
 		resetSketch()
 	});
+	
 	bothButton.mousePressed(() => {
 		showReg = true;
 		showFlashing = true
@@ -91,7 +92,7 @@ class Stairs {
 		this.y = y
 		this.stepWidth = stepWidth
 		this.color = color
-		this.counter = 1
+		this.counter = 0
 		this.currentSpeed = speed
 	}
 	move(speedOne,speedTwo) {
@@ -104,13 +105,14 @@ class Stairs {
 				this.x = this.x + speedOne
 			} else {
 				//cycle every 50 between fast down and slow up speed
-				if (Math.ceil(this.counter / 50) % 3 === 1 ) {
+				if (Math.ceil(this.counter / 60) % 3 === 0 ) {
 					this.x = this.x + speedOne
 					this.currentSpeed = speedOne
 				} else {
 					this.x = this.x + speedTwo
 					this.currentSpeed = speedTwo
 				}
+				//every time the ratchet moves, count up - then I can adjust how long it moves before switching direction
 				this.counter = this.counter + 1
 			}
 		}
@@ -154,6 +156,24 @@ function resetSketch() {
 			let x = 60 * i
 			let r = new Stairs(x,40,flashWidth,0,flSpeed1)
 			flashing.push(r)
+		}
+	}
+	//button colors
+	let col = color(4, 170, 109);
+	let pressCol = color(4,82,170);
+	if (showFlashing && showReg) {
+		bothButton.style('background-color', pressCol)
+		regButton.style('background-color', col)
+		flButton.style('background-color', col)
+	} else {
+		if (showReg) {
+			bothButton.style('background-color', col)
+			regButton.style('background-color', pressCol)
+			flButton.style('background-color', col)
+		} if (showFlashing) {
+			bothButton.style('background-color', col)
+			regButton.style('background-color', col)
+			flButton.style('background-color', pressCol)
 		}
 	}
 }
