@@ -7,6 +7,8 @@ let regSpeed = 1 //one speed for regular and 2 for the flashing
 let flSpeed1 = 3 //the fast flashing DOWN speed
 let flSpeed2 = -1 //slow flashing UP speed
 
+let period = 30
+
 let showReg = true
 let showFlashing = true
 
@@ -17,7 +19,7 @@ let button, regButton, flButton, bothButton
 
 
 function setup() {
-	createCanvas(600,500);
+	createCanvas(500,500);
 	button = createButton('Reset');
 	regButton = createButton('Regular');
 	flButton = createButton('Flashing');
@@ -105,7 +107,7 @@ class Stairs {
 				this.x = this.x + speedOne
 			} else {
 				//cycle every 50 between fast down and slow up speed
-				if (Math.ceil(this.counter / 60) % 3 === 0 ) {
+				if (Math.ceil(this.counter / period) % 3 === 0 ) {
 					this.x = this.x + speedOne
 					this.currentSpeed = speedOne
 				} else {
