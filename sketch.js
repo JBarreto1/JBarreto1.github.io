@@ -4,10 +4,10 @@ let regWidth = 60 //control the width of the regular step in pixels
 let flashWidth = 80 //control the width of the flash step in pixels
 
 let regSpeed = 1 //one speed for regular and 2 for the flashing
-let flSpeed1 = 3 //the fast flashing DOWN speed
+let flSpeed1 = 4 //the fast flashing DOWN speed
 let flSpeed2 = -1 //slow flashing UP speed
 
-let period = 30
+let period = 50
 
 let showReg = true
 let showFlashing = true
@@ -16,6 +16,19 @@ let regular = []
 let flashing = []
 
 let button, regButton, flButton, bothButton
+
+function paramInput() {
+	regSpeed = parseInt(document.getElementById("regSpeed").value);
+	flSpeed1 = parseInt(document.getElementById("flSpeed1").value);
+	enteredflSpeed2 = parseInt(document.getElementById("flSpeed2").value);
+	flSpeed2 = -enteredflSpeed2
+	period = parseInt(document.getElementById("period").value);
+	// document.getElementById("demo").innerHTML = x;
+	// let x = document.getElementById("regSpeed").value;
+	
+	// console.log(typeof(x))
+	resetSketch()
+}
 
 
 function setup() {
