@@ -1,44 +1,56 @@
-let ballLoc = 0 //which step is the ball on?
+let winHeight = 600
+let winWidth = 500
+
+let ballLoc = 4 //which step is the ball on?
 let ballOnReg = true //which stair set is the ball on? true=reg false=flashing
 let regWidth = 60 //control the width of the regular step in pixels
 let flashWidth = 80 //control the width of the flash step in pixels
 
 let regSpeed = 1 //one speed for regular and 2 for the flashing
-let flSpeed1 = 4 //the fast flashing DOWN speed
-let flSpeed2 = -1 //slow flashing UP speed
+let flSpeed1 = 9 //the fast flashing DOWN speed
+let flSpeed2 = -3 //slow flashing UP speed
 
-let period = 50
+let fracSpeed1 = 1 //slow down the movement of all of the steps (only move every x cycles)
+
+let period = 11
 
 let showReg = true
 let showFlashing = true
+
+let stepHeight = 80
+
+let stepNum = 9
+let stepOffset = 1
 
 let regular = []
 let flashing = []
 
 let button, regButton, flButton, bothButton
 
-function paramInput() {
-	regSpeed = parseInt(document.getElementById("regSpeed").value);
-	flSpeed1 = parseInt(document.getElementById("flSpeed1").value);
-	enteredflSpeed2 = parseInt(document.getElementById("flSpeed2").value);
-	flSpeed2 = -enteredflSpeed2
-	period = parseInt(document.getElementById("period").value);
-	// document.getElementById("demo").innerHTML = x;
-	// let x = document.getElementById("regSpeed").value;
+// function paramInput() {
+// 	regSpeed = parseInt(document.getElementById("regSpeed").value);
+// 	flSpeed1 = parseInt(document.getElementById("flSpeed1").value);
+// 	enteredflSpeed2 = parseInt(document.getElementById("flSpeed2").value);
+// 	flSpeed2 = -enteredflSpeed2
+// 	period = parseInt(document.getElementById("period").value);
+// 	// document.getElementById("demo").innerHTML = x;
+// 	// let x = document.getElementById("regSpeed").value;
 	
-	// console.log(typeof(x))
-	resetSketch()
-}
+// 	// console.log(typeof(x))
+// 	resetSketch()
+// }
 
 
 function setup() {
-	createCanvas(500,500);
-	button = createButton('Reset');
+	createCanvas(winWidth,winHeight);
+	// button = createButton('Reset');
 	regButton = createButton('Regular');
 	flButton = createButton('Flashing');
 	bothButton = createButton('Both');
+	speedButton = createButton('Full Speed');
+	speedButton.style('background-color', color(0,0,0))
 	resetSketch()
-	button.mousePressed(resetSketch);
+	// button.mousePressed(resetSketch);
 	regButton.mousePressed( () => {
 		showReg = true;
 		showFlashing = false
@@ -54,6 +66,15 @@ function setup() {
 	bothButton.mousePressed(() => {
 		showReg = true;
 		showFlashing = true
+		resetSketch()
+	});
+
+	speedButton.mousePressed(() => {
+		if (fracSpeed1 == 1) {
+			fracSpeed1 = 2
+		} else {
+			fracSpeed1 = 1
+		}
 		resetSketch()
 	});
 }
@@ -78,8 +99,8 @@ function draw() {
 		for (let i = 0; i < flashing.length; i++) {
 			//if the ball is on the regular stair cycle through the flashing steps
 			//if one of the flashing steps is between where the ball is now and where its going to be LOWER then it catches the ball
-			if (flashing[i].x <= regular[curBallLoc].x + regular[curBallLoc].currentSpeed && flashing[i].x >= regular[curBallLoc].x) {
-				if (regular[curBallLoc].currentSpeed > flashing[i].currentSpeed) {
+			if (regular[curBallLoc].currentSpeed > flashing[i].currentSpeed) {
+				if (flashing[i].x <= regular[curBallLoc].x + regular[curBallLoc].currentSpeed && flashing[i].x >= regular[curBallLoc].x + flashing[i].currentSpeed) {
 					ballLoc = i
 					ballOnReg = false
 				}
@@ -90,8 +111,8 @@ function draw() {
 		for (let i = 0; i < regular.length; i++) {
 			//if the ball is on the regular stair cycle through the flashing steps
 			//if one of the flashing steps is between where the ball is now and where its going to be HIGHER then it catches the ball
-			if (regular[i].x > flashing[curBallLoc].x - flashing[curBallLoc].currentSpeed && regular[i].x < flashing[curBallLoc].x) {
-				if(flashing[curBallLoc].currentSpeed > regular[i].currentSpeed) {
+			if(flashing[curBallLoc].currentSpeed > regular[i].currentSpeed) {
+				if (regular[i].x > flashing[curBallLoc].x - flashing[curBallLoc].currentSpeed && regular[i].x < flashing[curBallLoc].x + regular[i].currentSpeed) {
 					ballLoc = i
 					ballOnReg = true
 				}
@@ -111,37 +132,56 @@ class Stairs {
 		this.currentSpeed = speed
 	}
 	move(speedOne,speedTwo) {
-		//move the stairs down. if we reach the bottom (we went beyond the 600 canvas) jump to a bit beyond the top
-		if (this.x > 600) {
-			this.x = -120
-		} else {
+		if (this.counter % fracSpeed1 === 0) {
 			//if there is only one speed, then it's the regualr stairs and just move at that speed
 			if (typeof speedTwo === 'undefined') {
 				this.x = this.x + speedOne
+				// if (this.counter % fracSpeed1 === 0) {
+				// 	this.x = this.x + speedOne
+				// 	// this.x = this.x + 1
+				// }
 			} else {
-				//cycle every 50 between fast down and slow up speed
-				if (Math.ceil(this.counter / period) % 3 === 0 ) {
+				//cycle every period (50) between fast down and slow up speed
+				// also adjust the period for fractional speed
+				// console.log(this.counter)
+				if (Math.ceil(this.counter / (period * fracSpeed1)) % 3 === 0 ) {
 					this.x = this.x + speedOne
+					// if (this.counter % fracSpeed1 === 0) {
+					// 	this.x = this.x + speedOne
+					// }
 					this.currentSpeed = speedOne
 				} else {
 					this.x = this.x + speedTwo
+					// if (this.counter % fracSpeed1 === 0) {
+					// 	this.x = this.x + speedTwo
+					// }
 					this.currentSpeed = speedTwo
 				}
-				//every time the ratchet moves, count up - then I can adjust how long it moves before switching direction
-				this.counter = this.counter + 1
 			}
+			//every time the ratchet moves, count up - then I can adjust how long it moves before switching direction
 		}
+		this.counter = this.counter + 1
 	}
 	show(hasBall) {
 		stroke(255)
 		strokeWeight(1);
 		fill(this.color)
+		let bottom = stepHeight * (stepNum - stepOffset)
+		let top = (-1 * stepHeight * stepOffset)
+		//move the stairs down. if we reach the bottom (we went beyond the canvas height) jump to a bit beyond the top
+		if (this.x < top) {
+			this.x = bottom - (top - this.x)
+		}
+		if (this.x > bottom) {
+			this.x = top + (this.x - bottom)
+		}
+
 		let newx = this.x
 		let newy = this.y
 		beginShape();
 		vertex(newy, newx);
 		vertex(newy + this.stepWidth, newx);
-		vertex(newy, newx + 90);
+		vertex(newy, newx + 120);
 		endShape(CLOSE);
 		if (hasBall){
 			fill(250)
@@ -156,39 +196,55 @@ function resetSketch() {
 	ballLoc = 0
 	//construct the stairs for both ratchets
 	//each ratchet is made of 12 steps that begin of screen (negative x value)
+	let regColor = color(4,82,170); 
+	let flColor = color(4, 170, 109)
 	if (showReg) {
 		ballOnReg = true
-		for (let i = -2; i < 10; i++) {
-			let x = 60 * i
-			let r = new Stairs(x,40,regWidth,120,regSpeed)
+		for (let i = -1 * (stepOffset - 1); i < stepNum - stepOffset + 1; i++) {
+			let x = stepHeight * i
+			let r = new Stairs(x,stepHeight,regWidth,regColor,regSpeed)
 			regular.push(r)
 		}
 	} else {
 		ballOnReg = false //if the regular stair is off, the ball has to start on flashing
 	}
 	if (showFlashing){
-		for (let i = -2; i < 10; i++) {
-			let x = 60 * i
-			let r = new Stairs(x,40,flashWidth,0,flSpeed1)
+		for (let i = -1 * (stepOffset - 1); i < stepNum - stepOffset + 1; i++) {
+			let x = stepHeight * i
+			let r = new Stairs(x,stepHeight,flashWidth,flColor,flSpeed1)
 			flashing.push(r)
 		}
 	}
 	//button colors
-	let col = color(4, 170, 109);
-	let pressCol = color(4,82,170);
+	// let col = color(4, 170, 109);
+	// let pressCol = color(4,82,170);
+	let black = color(0, 0, 0);
+	let white = color(255,255,255);
+	let pressRCol = color(4, 48, 100)
+	let pressFlCol = color(4, 117, 76)
 	if (showFlashing && showReg) {
-		bothButton.style('background-color', pressCol)
-		regButton.style('background-color', col)
-		flButton.style('background-color', col)
+		bothButton.style('background-color', color(50))
+		bothButton.style('color', white)
+		regButton.style('background-color', regColor)
+		flButton.style('background-color', flColor)
 	} else {
 		if (showReg) {
-			bothButton.style('background-color', col)
-			regButton.style('background-color', pressCol)
-			flButton.style('background-color', col)
+			bothButton.style('background-color', color(220))
+			bothButton.style('color', black)
+			regButton.style('background-color', pressRCol)
+			flButton.style('background-color', flColor)
 		} if (showFlashing) {
-			bothButton.style('background-color', col)
-			regButton.style('background-color', col)
-			flButton.style('background-color', pressCol)
+			bothButton.style('background-color', color(220))
+			bothButton.style('color', black)
+			regButton.style('background-color', regColor)
+			flButton.style('background-color', pressFlCol)
 		}
 	}
+	//speed button text change
+	if (fracSpeed1 == 1) {
+		speedButton.html('Half Speed')
+	} else {
+		speedButton.html('Full Speed')
+	}
+	
 }
