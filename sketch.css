@@ -21,3 +21,12 @@ p {
 input {
     width: 40px;
 }
+
+div {
+    border: none;
+    font-size: 16px;
+    color: #FFFFFF;
+    padding: 10px;
+    width: 100px;
+    text-align: center;
+}

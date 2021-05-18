@@ -52,6 +52,7 @@ function setup() {
 	bothButton = createButton('Both');
 	speedButton = createButton('Full Speed');
 	speedButton.style('background-color', color(0,0,0))
+	showAverageSpeed = createButton('Show Average Speed');
 	resetSketch()
 	// button.mousePressed(resetSketch);
 	regButton.mousePressed( () => {
@@ -75,13 +76,27 @@ function setup() {
 	speedButton.mousePressed(() => {
 		if (fracSpeed1 == 1) {
 			fracSpeed1 = 2
+			speedButton.html('Full Speed')
 		} else {
 			fracSpeed1 = 1
+			speedButton.html('Half Speed')
 		}
 		resetSketch()
 	});
-	avePos = createDiv('').size(100, 100);
-	// avePos.html('hi');
+
+	showAverageSpeed.mousePressed(() => {
+		if (showAveSpeed) {
+			showAveSpeed = false
+			showAverageSpeed.html('Show Average Speed')
+			avePos.remove()
+		} else {
+			showAveSpeed = true
+			showAverageSpeed.html('Hide Average Speed')
+			avePos = createDiv('').size(100, 100);
+		}
+		resetSketch()
+	});
+	
 }
 
 function draw() {
@@ -132,7 +147,14 @@ function draw() {
 		posTracker = ((posTracker * (curCount - 1)) + curSpeed) / curCount
 	}
 	if (showAveSpeed) {
-		avePos.html(posTracker);
+		let roundPos = -1 * posTracker.toFixed(2)
+		avePos.html(roundPos);
+		if (roundPos > 0) {
+			avePos.style('background-color', color(4, 170, 109))
+		}
+		else {
+			avePos.style('background-color', color(170, 4, 4))
+		}
 	}
 }
 
@@ -254,12 +276,6 @@ function resetSketch() {
 			regButton.style('background-color', regColor)
 			flButton.style('background-color', pressFlCol)
 		}
-	}
-	//speed button text change
-	if (fracSpeed1 == 1) {
-		speedButton.html('Half Speed')
-	} else {
-		speedButton.html('Full Speed')
 	}
 	
 }
