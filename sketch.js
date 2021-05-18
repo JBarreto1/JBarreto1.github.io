@@ -1,7 +1,7 @@
 let winHeight = 600
 let winWidth = 500
 
-let ballLoc = 4 //which step is the ball on?
+let ballLoc //which step is the ball on?
 let ballOnReg = true //which stair set is the ball on? true=reg false=flashing
 let regWidth = 60 //control the width of the regular step in pixels
 let flashWidth = 80 //control the width of the flash step in pixels
@@ -25,7 +25,10 @@ let stepOffset = 1
 let regular = []
 let flashing = []
 
-let button, regButton, flButton, bothButton
+let posTracker = 0
+let showAveSpeed = false
+
+let button, regButton, flButton, bothButton, avePos
 
 // function paramInput() {
 // 	regSpeed = parseInt(document.getElementById("regSpeed").value);
@@ -77,6 +80,8 @@ function setup() {
 		}
 		resetSketch()
 	});
+	avePos = createDiv('').size(100, 100);
+	// avePos.html('hi');
 }
 
 function draw() {
@@ -107,6 +112,9 @@ function draw() {
 			}
 		}
 		regular[curBallLoc].show(true)
+		let curSpeed = regular[curBallLoc].currentSpeed
+		let curCount = regular[curBallLoc].counter
+		posTracker = ((posTracker * (curCount - 1)) + curSpeed) / curCount
 	} else {
 		for (let i = 0; i < regular.length; i++) {
 			//if the ball is on the regular stair cycle through the flashing steps
@@ -119,6 +127,12 @@ function draw() {
 			}
 		}
 		flashing[curBallLoc].show(true)
+		let curSpeed = flashing[curBallLoc].currentSpeed
+		let curCount = flashing[curBallLoc].counter
+		posTracker = ((posTracker * (curCount - 1)) + curSpeed) / curCount
+	}
+	if (showAveSpeed) {
+		avePos.html(posTracker);
 	}
 }
 
@@ -193,7 +207,8 @@ class Stairs {
 function resetSketch() {
 	regular = []
 	flashing = []
-	ballLoc = 0
+	ballLoc = Math.floor(stepNum / 2)
+	posTracker = 0
 	//construct the stairs for both ratchets
 	//each ratchet is made of 12 steps that begin of screen (negative x value)
 	let regColor = color(4,82,170); 
